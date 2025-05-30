@@ -1,9 +1,8 @@
+// src/lib/firebase.ts
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
-import { getStorage } from "firebase/storage";
 
-/** 環境變數請確定已在 .env.local & Vercel 上設定 */
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -11,12 +10,19 @@ const firebaseConfig = {
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-/** 避免 Hot Reload 時重複初始化 */
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+/** 只有瀏覽器才初始化；Build(SSR) 時跳過 */
+function createFirebase() {
+  if (typeof window === "undefined") return null;
+  const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+  return {
+    db: getFirestore(app),
+    auth: getAuth(app),
+  };
+}
 
-/** Firestore / Auth / Storage 共享實例 */
-export const db = getFirestore(app);
-export const auth = getAuth(app);
-export const storage = getStorage(app);
+export const firebase = createFirebase();
+export const db = firebase?.db;
+export const auth = firebase?.auth;
