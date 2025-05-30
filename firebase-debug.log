@@ -1,0 +1,119 @@
+[debug] [2025-05-29T04:33:33.878Z] ----------------------------------------------------------------------
+[debug] [2025-05-29T04:33:33.879Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\User\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --only functions --debug
+[debug] [2025-05-29T04:33:33.879Z] CLI Version:   14.4.0
+[debug] [2025-05-29T04:33:33.879Z] Platform:      win32
+[debug] [2025-05-29T04:33:33.880Z] Node Version:  v20.18.0
+[debug] [2025-05-29T04:33:33.880Z] Time:          Thu May 29 2025 12:33:33 GMT+0800 (台北標準時間)
+[debug] [2025-05-29T04:33:33.880Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-05-29T04:33:33.984Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-05-29T04:33:33.984Z] > authorizing via signed-in user (aa0900286311@gmail.com)
+[debug] [2025-05-29T04:33:33.985Z] [iam] checking project autoserve-express for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]
+[debug] [2025-05-29T04:33:33.986Z] Checked if tokens are valid: true, expires at: 1748496444542
+[debug] [2025-05-29T04:33:33.986Z] Checked if tokens are valid: true, expires at: 1748496444542
+[debug] [2025-05-29T04:33:33.986Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/autoserve-express:testIamPermissions [none]
+[debug] [2025-05-29T04:33:33.987Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/autoserve-express:testIamPermissions x-goog-quota-user=projects/autoserve-express
+[debug] [2025-05-29T04:33:33.987Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/autoserve-express:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2025-05-29T04:33:34.840Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/autoserve-express:testIamPermissions 200
+[debug] [2025-05-29T04:33:34.841Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/autoserve-express:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2025-05-29T04:33:34.841Z] Checked if tokens are valid: true, expires at: 1748496444542
+[debug] [2025-05-29T04:33:34.841Z] Checked if tokens are valid: true, expires at: 1748496444542
+[debug] [2025-05-29T04:33:34.842Z] >>> [apiv2][query] POST https://iam.googleapis.com/v1/projects/autoserve-express/serviceAccounts/autoserve-express@appspot.gserviceaccount.com:testIamPermissions [none]
+[debug] [2025-05-29T04:33:34.842Z] >>> [apiv2][body] POST https://iam.googleapis.com/v1/projects/autoserve-express/serviceAccounts/autoserve-express@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[debug] [2025-05-29T04:33:35.099Z] <<< [apiv2][status] POST https://iam.googleapis.com/v1/projects/autoserve-express/serviceAccounts/autoserve-express@appspot.gserviceaccount.com:testIamPermissions 200
+[debug] [2025-05-29T04:33:35.100Z] <<< [apiv2][body] POST https://iam.googleapis.com/v1/projects/autoserve-express/serviceAccounts/autoserve-express@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[info] 
+[info] === Deploying to 'autoserve-express'...
+[info] 
+[info] i  deploying functions 
+[debug] [2025-05-29T04:33:35.102Z] Checked if tokens are valid: true, expires at: 1748496444542
+[debug] [2025-05-29T04:33:35.102Z] Checked if tokens are valid: true, expires at: 1748496444542
+[debug] [2025-05-29T04:33:35.102Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/autoserve-express/services/cloudresourcemanager.googleapis.com [none]
+[debug] [2025-05-29T04:33:35.102Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/autoserve-express/services/cloudresourcemanager.googleapis.com x-goog-quota-user=projects/autoserve-express
+[debug] [2025-05-29T04:33:36.256Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/autoserve-express/services/cloudresourcemanager.googleapis.com 200
+[debug] [2025-05-29T04:33:36.256Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/autoserve-express/services/cloudresourcemanager.googleapis.com [omitted]
+[debug] [2025-05-29T04:33:36.256Z] Checked if tokens are valid: true, expires at: 1748496444542
+[debug] [2025-05-29T04:33:36.256Z] Checked if tokens are valid: true, expires at: 1748496444542
+[debug] [2025-05-29T04:33:36.256Z] >>> [apiv2][query] GET https://cloudresourcemanager.googleapis.com/v1/projects/autoserve-express [none]
+[debug] [2025-05-29T04:33:36.466Z] <<< [apiv2][status] GET https://cloudresourcemanager.googleapis.com/v1/projects/autoserve-express 200
+[debug] [2025-05-29T04:33:36.467Z] <<< [apiv2][body] GET https://cloudresourcemanager.googleapis.com/v1/projects/autoserve-express {"projectNumber":"273365680235","projectId":"autoserve-express","lifecycleState":"ACTIVE","name":"autoserve-express","labels":{"firebase":"enabled","firebase-core":"disabled","generative-language":"enabled"},"createTime":"2025-05-28T14:21:43.041266Z"}
+[info] i  functions: preparing codebase default for deployment 
+[info] i  functions: ensuring required API cloudfunctions.googleapis.com is enabled... 
+[debug] [2025-05-29T04:33:36.468Z] Checked if tokens are valid: true, expires at: 1748496444542
+[debug] [2025-05-29T04:33:36.468Z] Checked if tokens are valid: true, expires at: 1748496444542
+[debug] [2025-05-29T04:33:36.468Z] Checked if tokens are valid: true, expires at: 1748496444542
+[debug] [2025-05-29T04:33:36.469Z] Checked if tokens are valid: true, expires at: 1748496444542
+[info] i  functions: ensuring required API cloudbuild.googleapis.com is enabled... 
+[debug] [2025-05-29T04:33:36.469Z] Checked if tokens are valid: true, expires at: 1748496444542
+[debug] [2025-05-29T04:33:36.469Z] Checked if tokens are valid: true, expires at: 1748496444542
+[info] i  artifactregistry: ensuring required API artifactregistry.googleapis.com is enabled... 
+[debug] [2025-05-29T04:33:36.469Z] Checked if tokens are valid: true, expires at: 1748496444542
+[debug] [2025-05-29T04:33:36.469Z] Checked if tokens are valid: true, expires at: 1748496444542
+[debug] [2025-05-29T04:33:36.470Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/autoserve-express/services/cloudfunctions.googleapis.com [none]
+[debug] [2025-05-29T04:33:36.470Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/autoserve-express/services/cloudfunctions.googleapis.com x-goog-quota-user=projects/autoserve-express
+[debug] [2025-05-29T04:33:36.470Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/autoserve-express/services/runtimeconfig.googleapis.com [none]
+[debug] [2025-05-29T04:33:36.470Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/autoserve-express/services/runtimeconfig.googleapis.com x-goog-quota-user=projects/autoserve-express
+[debug] [2025-05-29T04:33:36.472Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/autoserve-express/services/cloudbuild.googleapis.com [none]
+[debug] [2025-05-29T04:33:36.472Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/autoserve-express/services/cloudbuild.googleapis.com x-goog-quota-user=projects/autoserve-express
+[debug] [2025-05-29T04:33:36.474Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/autoserve-express/services/artifactregistry.googleapis.com [none]
+[debug] [2025-05-29T04:33:36.474Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/autoserve-express/services/artifactregistry.googleapis.com x-goog-quota-user=projects/autoserve-express
+[debug] [2025-05-29T04:33:37.026Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/autoserve-express/services/cloudfunctions.googleapis.com 200
+[debug] [2025-05-29T04:33:37.027Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/autoserve-express/services/cloudfunctions.googleapis.com [omitted]
+[info] +  functions: required API cloudfunctions.googleapis.com is enabled 
+[debug] [2025-05-29T04:33:37.571Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/autoserve-express/services/runtimeconfig.googleapis.com 200
+[debug] [2025-05-29T04:33:37.571Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/autoserve-express/services/runtimeconfig.googleapis.com [omitted]
+[debug] [2025-05-29T04:33:37.584Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/autoserve-express/services/artifactregistry.googleapis.com 200
+[debug] [2025-05-29T04:33:37.584Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/autoserve-express/services/artifactregistry.googleapis.com [omitted]
+[info] +  artifactregistry: required API artifactregistry.googleapis.com is enabled 
+[debug] [2025-05-29T04:33:37.607Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/autoserve-express/services/cloudbuild.googleapis.com 200
+[debug] [2025-05-29T04:33:37.607Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/autoserve-express/services/cloudbuild.googleapis.com [omitted]
+[info] +  functions: required API cloudbuild.googleapis.com is enabled 
+[debug] [2025-05-29T04:33:37.608Z] Checked if tokens are valid: true, expires at: 1748496444542
+[debug] [2025-05-29T04:33:37.608Z] Checked if tokens are valid: true, expires at: 1748496444542
+[debug] [2025-05-29T04:33:37.608Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/autoserve-express/adminSdkConfig [none]
+[debug] [2025-05-29T04:33:37.861Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/autoserve-express/adminSdkConfig 200
+[debug] [2025-05-29T04:33:37.861Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/autoserve-express/adminSdkConfig {"projectId":"autoserve-express","storageBucket":"autoserve-express.firebasestorage.app"}
+[debug] [2025-05-29T04:33:37.862Z] Checked if tokens are valid: true, expires at: 1748496444542
+[debug] [2025-05-29T04:33:37.862Z] Checked if tokens are valid: true, expires at: 1748496444542
+[debug] [2025-05-29T04:33:37.862Z] >>> [apiv2][query] GET https://runtimeconfig.googleapis.com/v1beta1/projects/autoserve-express/configs [none]
+[debug] [2025-05-29T04:33:38.122Z] <<< [apiv2][status] GET https://runtimeconfig.googleapis.com/v1beta1/projects/autoserve-express/configs 200
+[debug] [2025-05-29T04:33:38.122Z] <<< [apiv2][body] GET https://runtimeconfig.googleapis.com/v1beta1/projects/autoserve-express/configs {}
+[debug] [2025-05-29T04:33:38.123Z] Validating nodejs source
+[debug] [2025-05-29T04:33:38.560Z] > [functions] package.json contents: {
+  "name": "functions",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "firebase-admin": "^13.4.0",
+    "firebase-functions": "^6.3.2"
+  }
+}
+[debug] [2025-05-29T04:33:38.560Z] Building nodejs source
+[info] i  functions: Loading and analyzing source code for codebase default to determine what to deploy 
+[debug] [2025-05-29T04:33:38.561Z] Could not find functions.yaml. Must use http discovery
+[debug] [2025-05-29T04:33:38.566Z] Found firebase-functions binary at 'D:\MyGitHub\auto-order\functions\node_modules\.bin\firebase-functions'
+[info] Serving at port 8819
+
+[error] TypeError: functions.region is not a function
+    at Object.<anonymous> (D:\MyGitHub\auto-order\functions\index.js:3:32)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+    at loadModule (D:\MyGitHub\auto-order\functions\node_modules\firebase-functions\lib\runtime\loader.js:40:16)
+    at loadStack (D:\MyGitHub\auto-order\functions\node_modules\firebase-functions\lib\runtime\loader.js:157:23)
+    at D:\MyGitHub\auto-order\functions\node_modules\firebase-functions\lib\bin\firebase-functions.js:56:56
+
+[debug] [2025-05-29T04:33:38.824Z] Got response code 400; body Failed to generate manifest from function source: TypeError: functions.region is not a function
+[error] 
+[error] Error: Functions codebase could not be analyzed successfully. It may have a syntax or runtime error
