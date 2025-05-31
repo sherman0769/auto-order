@@ -171,7 +171,8 @@ export default function AdminDashboard() {
       const dt = o.createdAt
         ? new Date(o.createdAt.seconds * 1000).toISOString()
         : "";
-      const itemsText = o.items
+      const itemsText = Array.isArray(o.items)
+        ? o.items
         .map((it) => {
           const add = it.addons?.length
             ? `(+${it.addons.map((a) => a.name).join("+")})`
