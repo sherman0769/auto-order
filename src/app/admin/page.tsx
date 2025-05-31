@@ -179,7 +179,8 @@ export default function AdminDashboard() {
             : "";
           return `${it.name}${add}`;
         })
-        .join("|");
+        .join("|")
+        : "";
       return `"${o.id}","${dt}","${o.tableNo}",${o.totalAmount ?? 0},"${itemsText}"`;
     });
     const csv = header + rows.join("\r\n");
