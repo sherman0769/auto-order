@@ -2,6 +2,7 @@
 
 import { useState, ChangeEvent } from "react";
 import {
+  getStorage,
   getDownloadURL,
   ref,
   uploadBytesResumable,
@@ -13,7 +14,7 @@ import {
   updateDoc,
   doc,
 } from "firebase/firestore";
-import { db, storage } from "@/lib/firebase";
+import { db } from "@/lib/firebase";
 import { v4 as uuid } from "uuid";
 
 /* ---------- 型別 ---------- */
@@ -28,18 +29,21 @@ type Menu = {
 };
 type Props = {
   onClose: () => void;
-  menu: Menu | null;
+  menu: Menu | null; // null = 新增
 };
 
-/* ---------- 壓縮：長邊 800、16:9 ---------- */
+/* ---------- 工具：長邊 ≤1600、裁成 16:9 ---------- */
 async function compressTo16x9(file: File): Promise<Blob> {
-  const bmp = await createImageBitmap(file);
-  const ratio = bmp.width / bmp.height;
-  const maxLong = 800;
-  const srcW =
-    bmp.width >= bmp.height ? maxLong : Math.round(maxLong * ratio);
-  const srcH =
-    bmp.height > bmp.width ? maxLong : Math.round(maxLong / ratio);
+  const bitmap = await createImageBitmap(file);
+
+  /* 先把長邊縮到 1600 */
+  const max = 1600;
+  const longSide = Math.max(bitmap.width, bitmap.height);
+  const scale = longSide > max ? max / longSide : 1;
+  const srcW = Math.round(bitmap.width * scale);
+  const srcH = Math.round(bitmap.height * scale);
+
+  /* 16:9 中央裁切 */
   const cropW = srcW;
   const cropH = Math.round((srcW * 9) / 16);
   const offY = Math.max(0, (srcH - cropH) / 2);
@@ -47,9 +51,9 @@ async function compressTo16x9(file: File): Promise<Blob> {
   const canvas = document.createElement("canvas");
   canvas.width = cropW;
   canvas.height = cropH;
-  canvas
-    .getContext("2d")!
-    .drawImage(bmp, 0, offY, cropW, cropH, 0, 0, cropW, cropH);
+  const ctx = canvas.getContext("2d")!;
+  ctx.drawImage(bitmap, 0, offY, cropW, cropH, 0, 0, cropW, cropH);
+
   return await new Promise((res) =>
     canvas.toBlob((b) => res(b as Blob), "image/jpeg", 0.8)
   );
@@ -60,9 +64,7 @@ export default function MenuForm({ onClose, menu }: Props) {
   const [name, setName] = useState(menu?.name || "");
   const [price, setPrice] = useState<number | "">(menu?.price ?? "");
   const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(
-    menu?.imageUrl || null
-  );
+  const [preview, setPreview] = useState<string | null>(menu?.imageUrl || null);
   const [status, setStatus] = useState(menu?.status || "active");
   const [addons, setAddons] = useState<Addon[]>(menu?.addons || []);
   const [loading, setLoading] = useState(false);
@@ -73,61 +75,64 @@ export default function MenuForm({ onClose, menu }: Props) {
     const f = e.target.files?.[0] || null;
     setFile(f);
     if (f) {
-      const rd = new FileReader();
-      rd.onload = () => setPreview(rd.result as string);
-      rd.readAsDataURL(f);
-    } else setPreview(menu?.imageUrl || null);
+      const reader = new FileReader();
+      reader.onload = () => setPreview(reader.result as string);
+      reader.readAsDataURL(f);
+    } else {
+      setPreview(menu?.imageUrl || null);
+    }
   };
 
-  const addAddonRow = () =>
-    setAddons((p) => [...p, { name: "", price: 0 }]);
+  /* 加點 CRUD */
+  const addAddonRow = () => setAddons((p) => [...p, { name: "", price: 0 }]);
   const updateAddon = (i: number, k: keyof Addon, v: string) =>
     setAddons((p) =>
       p.map((a, idx) =>
         idx === i ? { ...a, [k]: k === "price" ? Number(v) : v } : a
       )
     );
-  const removeAddon = (i: number) =>
-    setAddons((p) => p.filter((_, idx) => idx !== i));
+  const removeAddon = (i: number) => setAddons((p) => p.filter((_, idx) => idx !== i));
 
   /* 送出 */
   const handleSubmit = async () => {
-    if (!storage) {
-      alert("Storage 尚未就緒，請重整再試");
-      return;
-    }
     if (!name || !price || (menu ? false : !file)) {
-      return alert("請填寫完整資料");
+      alert("請填寫完整資料");
+      return;
     }
 
     setLoading(true);
+    setProgress(0);
+
     try {
       let imageUrl = menu?.imageUrl || "";
+
+      /* -------- 上傳圖片 -------- */
       if (file) {
         const blob = await compressTo16x9(file);
-        const imgRef = ref(storage, `dishImages/${uuid()}.jpg`);
+        const storage = getStorage();          // ⭐ 在 client 端動態取得
+        const filename = `dishImages/${uuid()}.jpg`;
+        const imgRef = ref(storage, filename);
 
-        /* 監聽進度 + 錯誤 */
-        const task = uploadBytesResumable(imgRef, blob);
-        task.on(
-          "state_changed",
-          (snap) => {
-            const pct = Math.round(
-              (snap.bytesTransferred / snap.totalBytes) * 100
-            );
-            console.log("progress:", pct + "%");
-            setProgress(pct);
-          },
-          (err) => {
-            console.error("upload error:", err);
-            alert("上傳失敗：" + err.code);
-            setLoading(false);
-          }
-        );
-        await task;
-        imageUrl = await getDownloadURL(imgRef);
+        await new Promise<void>((resolve, reject) => {
+          const task = uploadBytesResumable(imgRef, blob);
+          task.on(
+            "state_changed",
+            (snap) => {
+              const pct = Math.round(
+                (snap.bytesTransferred / snap.totalBytes) * 100
+              );
+              setProgress(pct);
+            },
+            reject,
+            async () => {
+              imageUrl = await getDownloadURL(imgRef);
+              resolve();
+            }
+          );
+        });
       }
 
+      /* -------- 寫入 Firestore -------- */
       const payload = {
         name,
         price: Number(price),
@@ -150,7 +155,7 @@ export default function MenuForm({ onClose, menu }: Props) {
       onClose();
     } catch (e) {
       console.error(e);
-      alert("操作失敗");
+      alert("操作失敗，請重試");
     } finally {
       setLoading(false);
       setProgress(0);
