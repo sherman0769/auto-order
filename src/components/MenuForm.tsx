@@ -28,20 +28,18 @@ type Menu = {
 };
 type Props = {
   onClose: () => void;
-  menu: Menu | null; // null = 新增
+  menu: Menu | null;
 };
 
-/* ---------- 工具：長邊 ≤800、裁成 16:9 ---------- */
+/* ---------- 壓縮：長邊 800、16:9 ---------- */
 async function compressTo16x9(file: File): Promise<Blob> {
-  const bitmap = await createImageBitmap(file);
-
-  const ratio = bitmap.width / bitmap.height;
-  const maxLong = 800; // 降低解析度，手機更順暢
+  const bmp = await createImageBitmap(file);
+  const ratio = bmp.width / bmp.height;
+  const maxLong = 800;
   const srcW =
-    bitmap.width >= bitmap.height ? maxLong : Math.round(maxLong * ratio);
+    bmp.width >= bmp.height ? maxLong : Math.round(maxLong * ratio);
   const srcH =
-    bitmap.height > bitmap.width ? maxLong : Math.round(maxLong / ratio);
-
+    bmp.height > bmp.width ? maxLong : Math.round(maxLong / ratio);
   const cropW = srcW;
   const cropH = Math.round((srcW * 9) / 16);
   const offY = Math.max(0, (srcH - cropH) / 2);
@@ -49,9 +47,9 @@ async function compressTo16x9(file: File): Promise<Blob> {
   const canvas = document.createElement("canvas");
   canvas.width = cropW;
   canvas.height = cropH;
-  const ctx = canvas.getContext("2d")!;
-  ctx.drawImage(bitmap, 0, offY, cropW, cropH, 0, 0, cropW, cropH);
-
+  canvas
+    .getContext("2d")!
+    .drawImage(bmp, 0, offY, cropW, cropH, 0, 0, cropW, cropH);
   return await new Promise((res) =>
     canvas.toBlob((b) => res(b as Blob), "image/jpeg", 0.8)
   );
@@ -75,17 +73,14 @@ export default function MenuForm({ onClose, menu }: Props) {
     const f = e.target.files?.[0] || null;
     setFile(f);
     if (f) {
-      const reader = new FileReader();
-      reader.onload = () => setPreview(reader.result as string);
-      reader.readAsDataURL(f);
-    } else {
-      setPreview(menu?.imageUrl || null);
-    }
+      const rd = new FileReader();
+      rd.onload = () => setPreview(rd.result as string);
+      rd.readAsDataURL(f);
+    } else setPreview(menu?.imageUrl || null);
   };
 
-  /* 加點 CRUD */
   const addAddonRow = () =>
-    setAddons((prev) => [...prev, { name: "", price: 0 }]);
+    setAddons((p) => [...p, { name: "", price: 0 }]);
   const updateAddon = (i: number, k: keyof Addon, v: string) =>
     setAddons((p) =>
       p.map((a, idx) =>
@@ -98,7 +93,7 @@ export default function MenuForm({ onClose, menu }: Props) {
   /* 送出 */
   const handleSubmit = async () => {
     if (!storage) {
-      alert("雲端 Storage 尚未就緒，請重新整理後再試！");
+      alert("Storage 尚未就緒，請重整再試");
       return;
     }
     if (!name || !price || (menu ? false : !file)) {
@@ -110,17 +105,25 @@ export default function MenuForm({ onClose, menu }: Props) {
       let imageUrl = menu?.imageUrl || "";
       if (file) {
         const blob = await compressTo16x9(file);
-        const filename = `dishImages/${uuid()}.jpg`;
-        const imgRef = ref(storage, filename);
+        const imgRef = ref(storage, `dishImages/${uuid()}.jpg`);
 
-        // 監聽上傳進度
+        /* 監聽進度 + 錯誤 */
         const task = uploadBytesResumable(imgRef, blob);
-        task.on("state_changed", (snap) => {
-          const pct = Math.round(
-            (snap.bytesTransferred / snap.totalBytes) * 100
-          );
-          setProgress(pct);
-        });
+        task.on(
+          "state_changed",
+          (snap) => {
+            const pct = Math.round(
+              (snap.bytesTransferred / snap.totalBytes) * 100
+            );
+            console.log("progress:", pct + "%");
+            setProgress(pct);
+          },
+          (err) => {
+            console.error("upload error:", err);
+            alert("上傳失敗：" + err.code);
+            setLoading(false);
+          }
+        );
         await task;
         imageUrl = await getDownloadURL(imgRef);
       }
