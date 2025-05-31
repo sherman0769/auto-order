@@ -4,7 +4,7 @@ import { useState, ChangeEvent } from "react";
 import {
   getDownloadURL,
   ref,
-  uploadBytes,
+  uploadBytesResumable,
 } from "firebase/storage";
 import {
   addDoc,
@@ -31,19 +31,17 @@ type Props = {
   menu: Menu | null; // null = 新增
 };
 
-/* ---------- 工具：長邊 ≤1600、裁成 16:9 ---------- */
+/* ---------- 工具：長邊 ≤800、裁成 16:9 ---------- */
 async function compressTo16x9(file: File): Promise<Blob> {
   const bitmap = await createImageBitmap(file);
 
-  // 先把長邊縮到 1600 px
   const ratio = bitmap.width / bitmap.height;
-  const maxLong = 1600;
+  const maxLong = 800; // 降低解析度，手機更順暢
   const srcW =
     bitmap.width >= bitmap.height ? maxLong : Math.round(maxLong * ratio);
   const srcH =
     bitmap.height > bitmap.width ? maxLong : Math.round(maxLong / ratio);
 
-  // 16:9 中央裁切
   const cropW = srcW;
   const cropH = Math.round((srcW * 9) / 16);
   const offY = Math.max(0, (srcH - cropH) / 2);
@@ -70,6 +68,7 @@ export default function MenuForm({ onClose, menu }: Props) {
   const [status, setStatus] = useState(menu?.status || "active");
   const [addons, setAddons] = useState<Addon[]>(menu?.addons || []);
   const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   /* 圖片預覽 */
   const handleFile = (e: ChangeEvent<HTMLInputElement>) => {
@@ -98,13 +97,10 @@ export default function MenuForm({ onClose, menu }: Props) {
 
   /* 送出 */
   const handleSubmit = async () => {
-    console.log("submit clicked");
-
     if (!storage) {
       alert("雲端 Storage 尚未就緒，請重新整理後再試！");
       return;
     }
-
     if (!name || !price || (menu ? false : !file)) {
       return alert("請填寫完整資料");
     }
@@ -116,7 +112,16 @@ export default function MenuForm({ onClose, menu }: Props) {
         const blob = await compressTo16x9(file);
         const filename = `dishImages/${uuid()}.jpg`;
         const imgRef = ref(storage, filename);
-        await uploadBytes(imgRef, blob);
+
+        // 監聽上傳進度
+        const task = uploadBytesResumable(imgRef, blob);
+        task.on("state_changed", (snap) => {
+          const pct = Math.round(
+            (snap.bytesTransferred / snap.totalBytes) * 100
+          );
+          setProgress(pct);
+        });
+        await task;
         imageUrl = await getDownloadURL(imgRef);
       }
 
@@ -145,6 +150,7 @@ export default function MenuForm({ onClose, menu }: Props) {
       alert("操作失敗");
     } finally {
       setLoading(false);
+      setProgress(0);
     }
   };
 
@@ -194,7 +200,6 @@ export default function MenuForm({ onClose, menu }: Props) {
           <input
             type="file"
             accept="image/*"
-            capture="environment"
             onChange={handleFile}
             className="block w-full text-sm"
           />
@@ -242,7 +247,7 @@ export default function MenuForm({ onClose, menu }: Props) {
           disabled={loading}
           className="w-full bg-teal-600 text-white py-2 rounded hover:bg-teal-700 disabled:bg-gray-400"
         >
-          {loading ? "處理中…" : menu ? "更新" : "新增"}
+          {loading ? `處理中… ${progress}%` : menu ? "更新" : "新增"}
         </button>
       </div>
     </div>
