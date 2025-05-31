@@ -83,7 +83,8 @@ export default function AdminDashboard() {
       (snap) => {
         const list = snap.docs.map((d) => {
           const data = d.data();
-          const items: OrderItem[] = (data.items || []).map((it: any) =>
+          const raw = Array.isArray(data.items) ? data.items : [];
+          const items: OrderItem[] = raw.map((it: any) =>
             typeof it === "string"
               ? { name: it, price: 0, addons: [], subTotal: 0 }
               : it
