@@ -251,7 +251,8 @@ export default function AdminDashboard() {
                 </div>
 
                 <ul className="list-disc list-inside">
-                  {o.items.map((it, idx) => (
+                  {Array.isArray(o.items) &&
+                  o.items.map((it, idx) => (
                     <li key={idx}>
                       {it.name}
                       {it.price ? ` - $${it.price}` : ""}
@@ -439,7 +440,8 @@ export default function AdminDashboard() {
 
               {expanded === o.id && (
                 <ul className="mt-2 list-disc list-inside text-sm">
-                  {o.items.map((it, idx) => (
+                  {Array.isArray(o.items) &&
+                  o.items.map((it, idx) => (
                     <li key={idx}>
                       {it.name} {it.price ? `- $${it.price}` : ""}
                       {it.addons.map((a) => (
