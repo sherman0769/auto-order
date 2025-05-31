@@ -31,39 +31,31 @@ type Props = {
   menu: Menu | null; // null = 新增
 };
 
-/* ---------- 工具：壓縮成 16:9、最大寬 1280 ---------- */
+/* ---------- 工具：長邊 ≤1600、裁成 16:9 ---------- */
 async function compressTo16x9(file: File): Promise<Blob> {
-  const img = document.createElement("img");
-  img.src = URL.createObjectURL(file);
-  await new Promise((res) => (img.onload = res));
+  const bitmap = await createImageBitmap(file);
 
-  const { width: w, height: h } = img;
-  // 取中心裁成 16:9
-  let cropW = w,
-    cropH = (w * 9) / 16;
-  if (cropH > h) {
-    cropH = h;
-    cropW = (h * 16) / 9;
-  }
-  const sx = (w - cropW) / 2;
-  const sy = (h - cropH) / 2;
+  // 先把長邊縮到 1600 px
+  const ratio = bitmap.width / bitmap.height;
+  const maxLong = 1600;
+  const srcW =
+    bitmap.width >= bitmap.height ? maxLong : Math.round(maxLong * ratio);
+  const srcH =
+    bitmap.height > bitmap.width ? maxLong : Math.round(maxLong / ratio);
 
-  // 輸出寬 1280，如原始較小則用原始
-  const outW = Math.min(1280, cropW);
-  const outH = (outW * 9) / 16;
+  // 16:9 中央裁切
+  const cropW = srcW;
+  const cropH = Math.round((srcW * 9) / 16);
+  const offY = Math.max(0, (srcH - cropH) / 2);
 
   const canvas = document.createElement("canvas");
-  canvas.width = outW;
-  canvas.height = outH;
+  canvas.width = cropW;
+  canvas.height = cropH;
   const ctx = canvas.getContext("2d")!;
-  ctx.drawImage(img, sx, sy, cropW, cropH, 0, 0, outW, outH);
+  ctx.drawImage(bitmap, 0, offY, cropW, cropH, 0, 0, cropW, cropH);
 
   return await new Promise((res) =>
-    canvas.toBlob(
-      (b) => res(b as Blob),
-      "image/jpeg",
-      0.8 // 品質 80%
-    )
+    canvas.toBlob((b) => res(b as Blob), "image/jpeg", 0.8)
   );
 }
 
@@ -72,7 +64,9 @@ export default function MenuForm({ onClose, menu }: Props) {
   const [name, setName] = useState(menu?.name || "");
   const [price, setPrice] = useState<number | "">(menu?.price ?? "");
   const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(menu?.imageUrl || null);
+  const [preview, setPreview] = useState<string | null>(
+    menu?.imageUrl || null
+  );
   const [status, setStatus] = useState(menu?.status || "active");
   const [addons, setAddons] = useState<Addon[]>(menu?.addons || []);
   const [loading, setLoading] = useState(false);
@@ -107,14 +101,14 @@ export default function MenuForm({ onClose, menu }: Props) {
     console.log("submit clicked");
 
     if (!storage) {
-    alert("雲端 Storage 尚未就緒，請重新整理後再試！");
-    return;
-     }
+      alert("雲端 Storage 尚未就緒，請重新整理後再試！");
+      return;
+    }
 
     if (!name || !price || (menu ? false : !file)) {
       return alert("請填寫完整資料");
     }
-    
+
     setLoading(true);
     try {
       let imageUrl = menu?.imageUrl || "";
