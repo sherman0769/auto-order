@@ -104,9 +104,17 @@ export default function MenuForm({ onClose, menu }: Props) {
 
   /* 送出 */
   const handleSubmit = async () => {
+    console.log("submit clicked");
+
+    if (!storage) {
+    alert("雲端 Storage 尚未就緒，請重新整理後再試！");
+    return;
+     }
+
     if (!name || !price || (menu ? false : !file)) {
       return alert("請填寫完整資料");
     }
+    
     setLoading(true);
     try {
       let imageUrl = menu?.imageUrl || "";
